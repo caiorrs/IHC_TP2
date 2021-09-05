@@ -1,40 +1,82 @@
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, TextInput, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
+import {
+  setUpdateIntervalForType,
+  SensorTypes,
+  accelerometer,
+} from 'react-native-sensors';
+
+setUpdateIntervalForType(SensorTypes.accelerometer, 300);
 
 const Stack = createNativeStackNavigator();
 
 const Home = () => {
   const navigation = useNavigation();
 
-  const [text, setText] = useState('');
+  const [xAccel, setXAccel] = useState('');
+  const [yAccel, setYAccel] = useState('');
+  const [zAccel, setZAccel] = useState('');
 
-  const onSendMessage = () => {
-    navigation.navigate('Details', {text});
-  };
+  useEffect(() => {
+    accelerometer.subscribe(({x, y, z}) => {
+      setXAccel(x.toFixed(3));
+      setYAccel(y.toFixed(3));
+      setZAccel(z.toFixed(3));
+    });
+  }, []);
+
+  useEffect(() => {
+    if (Math.abs(xAccel) > 100) {
+      navigation.navigate('Details', {
+        text: 'You have reached 100g acceleration on x axis, are you Chuck Norris?',
+      });
+    } else if (Math.abs(xAccel) > 30) {
+      navigation.navigate('Details', {
+        text: 'You have reached 30g acceleration on x axis, be careful',
+      });
+    } else if (Math.abs(xAccel) > 10) {
+      navigation.navigate('Details', {
+        text: 'You have reached 10g acceleration on x axis, awesome',
+      });
+    } else if (Math.abs(xAccel) > 5) {
+      navigation.navigate('Details', {
+        text: 'You have reached 5g acceleration on x axis',
+      });
+    }
+  }, [xAccel]);
 
   return (
     <View style={styles.homeScreen}>
       <View style={styles.homeContainer}>
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Enter a message"
-            value={text}
-            onChangeText={setText}
+            value={`X: ${xAccel}`}
+            onChangeText={() => {}}
+            style={styles.input}
           />
         </View>
-        <TouchableOpacity style={styles.buttonSend} onPress={onSendMessage}>
-          <Text style={styles.buttonText}>SEND</Text>
-        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={`Y: ${yAccel}`}
+            onChangeText={() => {}}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={`Z: ${zAccel}`}
+            onChangeText={() => {}}
+            style={styles.input}
+          />
+        </View>
       </View>
+      <Text style={styles.instructions}>
+        Try to get the most acceleration possible on X axis (when ponrtrait) to
+        view a hidden message. Try spinning in place.
+      </Text>
     </View>
   );
 };
@@ -44,7 +86,6 @@ const Details = ({route}) => {
 
   return (
     <View style={styles.details}>
-      <Text style={styles.messageTitle}>Mensagem enviada da outra tela:</Text>
       <Text style={styles.message}>{text}</Text>
     </View>
   );
@@ -56,12 +97,12 @@ const RootStack = () => {
       <Stack.Screen
         name="Home"
         component={Home}
-        options={{title: 'Atividade 2'}}
+        options={{title: 'Atividade 3'}}
       />
       <Stack.Screen
         name="Details"
         component={Details}
-        options={{title: 'Atividade 2'}}
+        options={{title: 'Atividade 3'}}
       />
     </Stack.Navigator>
   );
@@ -111,6 +152,13 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 18,
+  },
+  input: {
+    color: '#000',
+  },
+  instructions: {
+    marginVertical: 20,
+    fontSize: 16,
   },
 });
 
