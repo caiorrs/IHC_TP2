@@ -1,111 +1,128 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-import type {Node} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
+  TextInput,
+  TouchableOpacity,
   View,
+  Text,
+  StyleSheet,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
+  const [sumResult, setSumResult] = useState('');
+  const [firstValue, setFirstValue] = useState('');
+  const [secondValue, setSecondValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+  const onSum = () => {
+    try {
+      if (firstValue.length && secondValue.length) {
+        setSumResult(Number(firstValue) + Number(secondValue));
+      } else {
+        throw new Error('Both values should ');
+      }
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(
+        'There was an error on the sum of these values, please check them and try again',
+      );
+    }
+  };
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const onChangeFirstValue = newText => {
+    setFirstValue(newText.replace(/\D/g, ''));
+  };
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const onChangeSecondValue = newText => {
+    setSecondValue(newText.replace(/\D/g, ''));
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView style={{flex: 1}}>
+      <View style={styles.container}>
+        <View style={styles.inputsContainer}>
+          <Text style={styles.title}>Atividade 1</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Enter a number"
+              value={firstValue}
+              onChangeText={onChangeFirstValue}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Enter a number"
+              value={secondValue}
+              onChangeText={onChangeSecondValue}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.resultContainer}>
+            <Text
+              style={errorMessage ? styles.errorMessage : styles.resultText}>
+              {errorMessage ? errorMessage : sumResult}
+            </Text>
+          </View>
         </View>
-      </ScrollView>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={onSum} style={styles.button}>
+            <Text style={styles.buttonText}>SUM</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
   },
-  sectionTitle: {
+  title: {
     fontSize: 24,
-    fontWeight: '600',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  inputsContainer: {
+    marginTop: 30,
   },
-  highlight: {
-    fontWeight: '700',
+  inputContainer: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#888',
+    marginVertical: 10,
+  },
+  input: {
+    textAlign: 'right',
+  },
+  resultContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  resultText: {
+    fontSize: 24,
+  },
+  errorMessage: {
+    fontSize: 16,
+    color: '#F00',
+  },
+  buttonContainer: {
+    marginVertical: 100,
+  },
+  button: {
+    backgroundColor: '#841289',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 20,
   },
 });
 
